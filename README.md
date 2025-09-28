@@ -6,6 +6,7 @@ VanitySearch may not compute a good grid size for your GPU, so try different val
 # Feature
 
 <ul>
+  <li>Start and Endkey</li>
   <li>Fixed size arithmetic</li>
   <li>Fast Modular Inversion (Delayed Right Shift 62 bits)</li>
   <li>SecpK1 Fast modular multiplication (2 steps folding 512bits to 256bits using 64 bits digits)</li>
