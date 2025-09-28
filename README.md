@@ -20,11 +20,7 @@ VanitySearch may not compute a good grid size for your GPU, so try different val
 
 # Discussion Thread
 
-[Disucussion about VanitySearch@bitcointalk](https://bitcointalk.org/index.php?topic=5112311.0)
 
-# Usage
-
-You can downlad latest release from https://github.com/JeanLucPons/VanitySearch/releases
 
 ```
 VanitySearch [-check] [-v] [-u] [-b] [-c] [-gpu] [-stop] [-i inputfile]
@@ -43,13 +39,16 @@ VanitySearch [-check] [-v] [-u] [-b] [-c] [-gpu] [-stop] [-i inputfile]
  -i inputfile: Get list of prefixes to search from specified file
  -o outputfile: Output results to the specified file
  -gpu gpuId1,gpuId2,...: List of GPU(s) to use, default is 0
- -g g1x,g1y,g2x,g2y, ...: Specify GPU(s) kernel gridsize, default is 8*(MP number),128
+ -g g1x,g1y,g2x,g2y, ...: Specify GPU(s) kernel gridsize, default is 8*(MP number)
+ -startkey hex_private_key: Start the search from a specific private key (hex format)
+ -endkey hex_private_key: End the search at a specific private key (hex format)
  -m: Specify maximun number of prefixes found by each kernel call
  -s seed: Specify a seed for the base key, default is random
  -ps seed: Specify a seed concatened with a crypto secure random seed
  -t threadNumber: Specify number of CPU thread, default is number of core
  -nosse: Disable SSE hash function
  -l: List cuda enabled devices
+ 
  -check: Check CPU and GPU kernel vs CPU
  -cp privKey: Compute public key (privKey in hex hormat)
  -kp: Generate key pair
@@ -61,97 +60,9 @@ VanitySearch [-check] [-v] [-u] [-b] [-c] [-gpu] [-stop] [-i inputfile]
 Exemple (Windows, Intel Core i7-4770 3.4GHz 8 multithreaded cores, GeForce GTX 1050 Ti):
 
 ```
-C:\C++\VanitySearch\x64\Release>VanitySearch.exe -stop -gpu 1TryMe
-VanitySearch v1.17
-Difficulty: 15318045009
-Search: 1TryMe [Compressed]
-Start Fri Jan 31 08:12:19 2020
-Base Key: DA12E013325F12D6B68520E327847218128B788E6A9F2247BC104A0EE2818F44
-Number of CPU thread: 7
-GPU: GPU #0 GeForce GTX 1050 Ti (6x128 cores) Grid(48x128)
-[251.82 Mkey/s][GPU 235.91 Mkey/s][Total 2^32.82][Prob 39.1%][50% in 00:00:12][Found 0]
-PubAddress: 1TryMeJT7cfs4M6csEyhWVQJPAPmJ4NGw
-Priv (WIF): p2pkh:Kxs4iWcqYHGBfzVpH4K94STNMHHz72DjaCuNdZeM5VMiP9zxMg15
-Priv (HEX): 0x310DBFD6AAB6A63FC71CAB1150A0305ECABBE46819641D2594155CD41D081AF1
+C:\C++\VanitySearch\x64\Release>VanitySearch.exe -stop -gpu -startkey 0000000000000000000000000000000000000000000000400000000000000000 -endkey 00000000000000000000000000000000000000000000007fffffffffffffffff 1PWo3J
 ```
 
-```
-C:\C++\VanitySearch\x64\Release>VanitySearch.exe -stop -gpu 3MyCoin
-VanitySearch v1.11
-Difficulty: 15318045009
-Search: 3MyCoin [Compressed]
-Start Wed Apr  3 14:52:45 2019
-Base Key:FAF4F856077398AE087372110BF47A1A713C8F94B19CDD962D240B6A853CAD8B
-Number of CPU thread: 7
-GPU: GPU #0 GeForce GTX 1050 Ti (6x128 cores) Grid(48x128)
-124.232 MK/s (GPU 115.601 MK/s) (2^33.18) [P 47.02%][50.00% in 00:00:07][0]
-Pub Addr: 3MyCoinoA167kmgPprAidSvv5NoM3Nh6N3
-Priv (WIF): p2wpkh-p2sh:L2qvghanHHov914THEzDMTpAyoRmxo7Rh85FLE9oKwYUrycWqudp
-Priv (HEX): 0xA7D14FBF43696CA0B3DBFFD0AB7C9ED740FE338B2B856E09F2E681543A444D58
-```
-
-```
-C:\C++\VanitySearch\x64\Release>VanitySearch.exe -stop -gpu bc1quantum
-VanitySearch v1.11
-Difficulty: 1073741824
-Search: bc1quantum [Compressed]
-Start Wed Apr  3 15:01:15 2019
-Base Key:B00FD8CDA85B11D4744C09E65C527D35E231D19084FBCA0BF2E48186F31936AE
-Number of CPU thread: 7
-GPU: GPU #0 GeForce GTX 1050 Ti (6x128 cores) Grid(48x128)
-256.896 MK/s (GPU 226.482 MK/s) (2^28.94) [P 38.03%][50.00% in 00:00:00][0]
-Pub Addr: bc1quantum898l8mx5pkvq2x250kkqsj7enpx3u4yt
-Priv (WIF): p2wpkh:L37xBVcFGeAZ9Tii7igqXBWmfiBhiwwiKQmchNXPV2LNREXQDLCp
-Priv (HEX): 0xB00FD8CDA85B11D4744C09E65C527D35E2B1D19095CFCA0BF2E48186F31979C2
-```
-
-# Generate a vanity address for a third party using split-key
-
-It is possible to generate a vanity address for a third party in a safe manner using split-key.\
-For instance, Alice wants a nice prefix but does not have CPU power. Bob has the requested CPU power but cannot know the private key of Alice, Alice has to use a split-key.
-
-## Step 1
-
-Alice generates a key pair on her computer then send the generated public key and the wanted prefix to Bob. It can be done by email, nothing is secret.  Nevertheless, Alice has to keep safely the private key and not expose it.
-```
-VanitySearch.exe -s "AliceSeed" -kp
-Priv : L4U2Ca2wyo721n7j9nXM9oUWLzCj19nKtLeJuTXZP3AohW9wVgrH
-Pub  : 03FC71AE1E88F143E8B05326FC9A83F4DAB93EA88FFEACD37465ED843FCC75AA81
-```
-Note: The key pair is a standard SecpK1 key pair and can be generated with a third party software.
-
-## Step 2
-
-Bob runs VanitySearch using the Alice's public key and the wanted prefix.
-```
-VanitySearch.exe -sp 03FC71AE1E88F143E8B05326FC9A83F4DAB93EA88FFEACD37465ED843FCC75AA81 -gpu -stop -o keyinfo.txt 1ALice
-```
-It generates a keyinfo.txt file containing the partial private key.
-```
-PubAddress: 1ALicegohz9YgrLLa4ADCmam7X2Zr6xJZx
-PartialPriv: L2hbovuDd8nG4nxjDq1yd5qDsSQiG8xFsAFbHMcThqfjSP6WLg89
-```
-Bob sends back this file to Alice. It can also be done by email. The partial private key does not allow anyone to guess the final Alice's private key.
-
-## Step 3
-
-Alice can then reconstructs the final private key using her private key (the one generated in step 1) and the keyinfo.txt from Bob.
-
-```
-VanitySearch.exe -rp L4U2Ca2wyo721n7j9nXM9oUWLzCj19nKtLeJuTXZP3AohW9wVgrH keyinfo.txt
-
-Pub Addr: 1ALicegohz9YgrLLa4ADCmam7X2Zr6xJZx
-Priv (WIF): p2pkh:L1NHFgT826hYNpNN2qd85S7F7cyZTEJ4QQeEinsCFzknt3nj9gqg
-Priv (HEX): 0x7BC226A19A1E9770D3B0584FF2CF89E5D43F0DC19076A7DE1943F284DA3FB2D0
-```
-
-## How it works
-
-Basically the -sp (start public key) adds the specified starting public key (let's call it Q) to the starting keys of each threads. That means that when you search (using -sp), you do not search for addr(k.G) but for addr(k<sub>part</sub>.G+Q) where k is the private key in the first case and k<sub>part</sub> the "partial private key" in the second case. G is the SecpK1 generator point.\
-Then the requester can reconstruct the final private key by doing k<sub>part</sub>+k<sub>secret</sub> (mod n) where k<sub>part</sub> is the partial private key found by the searcher and k<sub>secret</sub> is the private key of Q (Q=k<sub>secret</sub>.G). This is the purpose of the -rp option.\
-The searcher has found a match for addr(k<sub>part</sub>.G+k<sub>secret</sub>.G) without knowing k<sub>secret</sub> so the requester has the wanted address addr(k<sub>part</sub>.G+Q) and the corresponding private key k<sub>part</sub>+k<sub>secret</sub> (mod n). The searcher is not able to guess this final private key because he doesn't know k<sub>secret</sub> (he knows only Q).
-
-Note: This explanation is simplified, it does not take care of symmetry and endomorphism optimizations but the idea is the same.
 
 # Trying to attack a list of addresses
 
@@ -216,80 +127,8 @@ Note: The current relase has been compiled with CUDA SDK 10.0, if you have a dif
 Runnig VanitySearch (Intel(R) Xeon(R) CPU, 8 cores,  @ 2.93GHz, Quadro 600 (x2))
 ```sh
 $ export LD_LIBRARY_PATH=/usr/local/cuda-8.0/lib64
-$ ./VanitySearch -t 7 -gpu -gpuId 0,1 1TryMe
-# VanitySearch v1.10
-# Difficulty: 15318045009
-# Search: 1TryMe [Compressed]
-# Start Wed Mar 27 10:26:43 2019
-# Base Key:C6718D8E50C1A5877DE3E52021C116F7598826873C61496BDB7CAD668CE3DCE5
-# Number of CPU thread: 7
-# GPU: GPU #1 Quadro 600 (2x48 cores) Grid(16x128)
-# GPU: GPU #0 Quadro 600 (2x48 cores) Grid(16x128)
-# 40.284 MK/s (GPU 27.520 MK/s) (2^31.84) [P 22.24%][50.00% in 00:02:47][0]
-#
-# Pub Addr: 1TryMeERTZK7RCTemSJB5SNb2WcKSx45p
-# Priv (WIF): Ky9bMLDpb9o5rBwHtLaidREyA6NzLFkWJ19QjPDe2XDYJdmdUsRk
-# Priv (HEX): 0x398E7271AF3E5A78821C1ADFDE3EE90760A6B65F72D856CFE455B1264350BCE8
-```
+$ ./VanitySearch -t 7 -gpu -startkey 0000000000000000000000000000000000000000000000400000000000000000 -endkey 00000000000000000000000000000000000000000000007fffffffffffffffff 1PWo3J
 
-## Docker
-
-[![Docker Stars](https://img.shields.io/docker/stars/ratijas/vanitysearch.svg)](https://hub.docker.com/r/ratijas/vanitysearch)
-[![Docker Pulls](https://img.shields.io/docker/pulls/ratijas/vanitysearch.svg)](https://hub.docker.com/r/ratijas/vanitysearch)
-
-### Supported tags
-
- * [`latest`, `cuda-ccap-6`, `cuda-ccap-6.0` *(cuda/Dockerfile)*](./docker/cuda/Dockerfile)
- * [`cuda-ccap-5`, `cuda-ccap-5.2` *(cuda/Dockerfile)*](./docker/cuda/Dockerfile)
- * [`cuda-ccap-2`, `cuda-ccap-2.0` *(cuda/ccap-2.0.Dockerfile)*](./docker/cuda/ccap-2.0.Dockerfile)
- * [`cpu` *(cpu/Dockerfile)*](./docker/cpu/Dockerfile)
-
-### Docker build
-
-Docker images are build for CPU-only version and for each supported CUDA Compute capability version (`CCAP`). Generally, users should choose latest `CCAP` supported by their hardware and driver. Compatibility table can be found on [Wikipedia](https://en.wikipedia.org/wiki/CUDA#GPUs_supported) or at the official NVIDIA web page of your product.
-
-Docker uses multi-stage builds to improve final image size. Scripts are provided to facilitate the build process.
-
-When building on your own, full image name (including owner/repo parts) can be customized via `IMAGE_NAME` environment variable. It defaults to just `vanitysearch` withour owner part. Pre-built images are available on Docker hub from [@ratijas](https://hub.docker.com/r/ratijas/vanitysearch).
-
-#### Docker build / CPU-only
-
-Build and tag `vanitysearch:cpu` image:
-```sh
-$ ./docker/cpu/build.sh
-```
-
-#### Docker build / GPU
-
-Build with "default" GPU support, which might not be suitable for your system:
-```sh
-$ ./docker/cuda/build.sh
-```
-
-Build with customized GPU support:
-```sh
-$ env CCAP=5.2 CUDA=10.2 ./docker/cuda/build.sh
-```
-
-As for docker-compose folks, sorry, docker-composed GPUs are not (yet) supported on a 3.x branch. But it (hopefully) will change soon.
-
-### Docker run
-
-Note: VanitySearch image does not (neither should) require network access. To further ensure no data ever leaks from the running container, always pass `--network none` to the docker run command.
-
-```sh
-$ docker run -it --rm --gpus all --network none ratijas/vanitysearch:cuda-ccap-5.2 -gpu -c -stop 1docker
-# VanitySearch v1.18
-# Difficulty: 957377813
-# Search: 1docker [Compressed, Case unsensitive] (Lookup size 3)
-# Start Sat Jul 11 17:41:32 2020
-# Base Key: B506F2C7CA8AA2E826F2947012CFF15D2E6CD3DA5C562E8252C9F755F2A4C5D3
-# Number of CPU thread: 1
-# GPU: GPU #0 GeForce GTX 970M (10x128 cores) Grid(80x128)
-#
-# PubAddress: 1DoCKeRXYyydeQy6xxpneqtDovXFarAwrE
-# Priv (WIF): p2pkh:KzESATCZFmnH1RfwT5XbCF9dZSnDGTS8z61YjnQbgFiM7tXtcH73
-# Priv (HEX): 0x59E27084C6252377A8B7AABB20AFD975060914B3747BD6392930BC5BE7A06565
 ```
 
 # License
